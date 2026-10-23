@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "release",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_CONFIGURATION_TYPES": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    { 
+        "name": "release", 
+        "configurePreset": "release", 
+        "configuration": "Release"  
+    }
+  ]
+}

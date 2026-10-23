@@ -1,0 +1,9 @@
+{
+  "name": "transform-playground",
+  "version-string": "0.1.0",
+  "dependencies": [
+     "glfw3", 
+     "glad" 
+    ],
+  "builtin-baseline": "08098dce081e9411889686fc3f4aecbde95fc2b1"
+}
