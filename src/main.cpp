@@ -44,14 +44,20 @@ int main()
         // ------- this frame's UI -------
         ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_FirstUseEver);
         ImGui::Begin("2D Transformations");
-        static float angleDeg = 0.0f;
-        ImGui::SliderFloat("Angle (deg)", &angleDeg, 0.0f, 360.0f, "%.0f");
-        ImGui::Text("Value now: %.1f", angleDeg);
+        static float translation[2] = {0.0f, 0.0f};
+        static float rotationDeg = 0.0f;
+        static float scale[2] = {1.0f, 1.0f};
+        static float shear[2] = {0.0f, 0.0f};
+
+        ImGui::SliderFloat2("Translation (tx, ty)", translation, -5.0f, 5.0f, "%.1f");
+        ImGui::SliderFloat("Rotation (deg)", &rotationDeg, 0.0f, 360.0f, "%.0f");
+        ImGui::SliderFloat2("Scale (sx, sy)", scale, -3.0f, 3.0f, "%.1f");
+        ImGui::SliderFloat2("Shear (shearX, shearY)", shear, -1.0f, 1.0f, "%.2f");
 
         // ------- canvas region -------
         ImGui::BeginChild("canvas", ImVec2(0, 420), ImGuiChildFlags_Borders);
         {
-            const float scale = 60.0f; // pixels per world unit
+            const float viewScale = 60.0f; // pixels per world unit
             const ImVec2 wpos = ImGui::GetWindowPos();
             const ImVec2 wsiz = ImGui::GetWindowSize();
             const ImVec2 pmin = wpos;
@@ -64,8 +70,18 @@ int main()
             canvas::drawGrid(dl, pmin, pmax, origin, 40.0f);
 
             const auto square = math2d::makeSquare();
-            canvas::drawPolyline(dl, square, origin, scale,
+            canvas::drawPolyline(dl, square, origin, viewScale,
                                  IM_COL32(90, 170, 255, 255));
+
+            const math2d::Mat3 M = math2d::buildStandardTransform(
+                translation[0], translation[1],
+                rotationDeg,
+                scale[0], scale[1],
+                shear[0], shear[1]);
+
+            const auto transformed = math2d::transformShape(M, square);
+            canvas::drawPolyline(dl, transformed, origin, viewScale,
+                                 IM_COL32(255, 140, 60, 255));
         }
         ImGui::EndChild();
         ImGui::End();
