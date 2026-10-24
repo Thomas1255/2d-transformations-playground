@@ -44,6 +44,12 @@ int main()
         // ------- this frame's UI -------
         ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_FirstUseEver);
         ImGui::Begin("2D Transformations");
+
+        // init transformation values, pivot, and display option
+        static bool showOriginal = true;
+        static bool pivotRotation = false;
+        static bool pivotScale = false;
+        static float pivot[2] = {0.0f, 0.0f};
         static float translation[2] = {0.0f, 0.0f};
         static float rotationDeg = 0.0f;
         static float scale[2] = {1.0f, 1.0f};
@@ -53,6 +59,10 @@ int main()
         ImGui::SliderFloat("Rotation (deg)", &rotationDeg, 0.0f, 360.0f, "%.0f");
         ImGui::SliderFloat2("Scale (sx, sy)", scale, -3.0f, 3.0f, "%.1f");
         ImGui::SliderFloat2("Shear (shearX, shearY)", shear, -1.0f, 1.0f, "%.2f");
+        ImGui::Checkbox("Rotate about pivot", &pivotRotation);
+        ImGui::Checkbox("Scale about pivot", &pivotScale);
+        ImGui::SliderFloat2("Pivot (x, y)", pivot, -4.0f, 4.0f, "%.1f");
+        ImGui::Checkbox("Show original shape", &showOriginal);
 
         // ------- canvas region -------
         ImGui::BeginChild("canvas", ImVec2(0, 420), ImGuiChildFlags_Borders);
@@ -70,14 +80,34 @@ int main()
             canvas::drawGrid(dl, pmin, pmax, origin, 40.0f);
 
             const auto square = math2d::makeSquare();
-            canvas::drawPolyline(dl, square, origin, viewScale,
-                                 IM_COL32(90, 170, 255, 255));
+
+            if (showOriginal)
+            {
+                canvas::drawPolyline(dl, square, origin, viewScale,
+                                     IM_COL32(90, 170, 255, 255));
+            }
+
+            if (pivotRotation || pivotScale)
+            {
+                canvas::drawPivot(dl, pivot[0], pivot[1], origin, viewScale);
+            }
 
             const math2d::Mat3 M = math2d::buildStandardTransform(
                 translation[0], translation[1],
                 rotationDeg,
                 scale[0], scale[1],
-                shear[0], shear[1]);
+                shear[0], shear[1],
+                pivotRotation, pivotScale,
+                pivot[0], pivot[1]);
+
+            // rotated/sheared basis arrows: x is red, y is green
+            const auto bx = math2d::transformedBasisX(M);
+            canvas::drawArrow(dl, bx[0], bx[1], origin, viewScale,
+                              IM_COL32(230, 90, 90, 255));
+
+            const auto by = math2d::transformedBasisY(M);
+            canvas::drawArrow(dl, by[0], by[1], origin, viewScale,
+                              IM_COL32(90, 220, 110, 255));
 
             const auto transformed = math2d::transformShape(M, square);
             canvas::drawPolyline(dl, transformed, origin, viewScale,
