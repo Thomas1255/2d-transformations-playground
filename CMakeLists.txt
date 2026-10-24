@@ -27,7 +27,13 @@ target_include_directories(imgui PUBLIC
 target_compile_definitions(imgui PUBLIC IMGUI_IMPL_OPENGL_LOADER_GLAD)
 target_link_libraries(imgui PUBLIC glfw glad::glad)
 
+# ---------------- math2d (pure-matrix library) ----------------
+add_library(math2d STATIC src/math/Transform2D.cpp)
+target_include_directories(math2d PUBLIC ${CMAKE_SOURCE_DIR}/src)
+
 # ---------------- The app ----------------
-add_executable(TransformPlayground src/main.cpp)                      # executable
+add_executable(TransformPlayground
+    src/main.cpp
+    src/app/CanvasDrawing.cpp) # executable
 target_include_directories(TransformPlayground PRIVATE src)
-target_link_libraries(TransformPlayground PRIVATE imgui)      
+target_link_libraries(TransformPlayground PRIVATE imgui math2d)  
