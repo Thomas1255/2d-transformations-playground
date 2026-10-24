@@ -42,3 +42,6 @@ pivot point.
 │   └── imgui
 └── vcpkg.json
 ```
+
+## License
+Built using Dear ImGui (MIT) and GLAD (MIT). See [LICENSE](LICENSE)
