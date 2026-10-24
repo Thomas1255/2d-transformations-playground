@@ -43,7 +43,9 @@ int main()
         ImGui::SetNextWindowPos(ImVec2(16, 16), ImGuiCond_FirstUseEver);
         ImGui::Begin("2D Transformations");
 
-        constexpr float kWidgetX = 160.0f; // x where the slider column starts
+        // slider vars
+        constexpr float kWidgetX = 165.0f; // x where the slider column starts
+        constexpr float kWidgetWidth = 360.0f; // where slider ends
 
         // init transformation values, pivot, and display option
         static bool showOriginal = true;
@@ -63,28 +65,29 @@ int main()
         {
             ImGui::Text("%s", label);
             ImGui::SameLine(kWidgetX);
-            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+            ImGui::SetNextItemWidth(kWidgetWidth);
         };
 
+        // All sliders and labels
         labeled("Shape");
         ImGui::Combo("##shape", &shapeIndex, shapeNames, 4);
 
         labeled("Translation (tx, ty)");
-        ImGui::SliderFloat2("##txty", translation, -5.0f, 5.0f, "%.1f");
+        ImGui::SliderFloat2("##txty", translation, -5.0f, 5.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
         labeled("Rotation (deg)");
-        ImGui::SliderFloat("##rot", &rotationDeg, 0.0f, 360.0f, "%.0f");
+        ImGui::SliderFloat("##rot", &rotationDeg, 0.0f, 360.0f, "%.0f", ImGuiSliderFlags_AlwaysClamp);
 
         labeled("Scale (sx, sy)");
-        ImGui::SliderFloat2("##sxy", scale, -3.0f, 3.0f, "%.1f");
+        ImGui::SliderFloat2("##sxy", scale, -3.0f, 3.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
         labeled("Shear (shearX, shearY)");
-        ImGui::SliderFloat2("##shear", shear, -1.0f, 1.0f, "%.2f");
+        ImGui::SliderFloat2("##shear", shear, -1.0f, 1.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 
         ImGui::Checkbox("Rotate about pivot", &pivotRotation);
         ImGui::Checkbox("Scale about pivot", &pivotScale);
         labeled("Pivot (x, y)");
-        ImGui::SliderFloat2("##pivot", pivot, -4.0f, 4.0f, "%.1f");
+        ImGui::SliderFloat2("##pivot", pivot, -4.0f, 4.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
 
         ImGui::Checkbox("Show original shape", &showOriginal);
 
