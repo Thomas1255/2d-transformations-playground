@@ -12,3 +12,21 @@ pivot point.
 ## Features
 - Shapes: triangle, square, house, car
 - 3x3 matrix below the canvas
+
+## Project Structure
+```text
+2d-transformations-playground
+├── CMakeLists.txt
+├── CMakePresets.json
+├── LICENSE
+├── PROGRESS.md
+├── README.md
+├── build.cmd
+├── src
+│   ├── app
+│   ├── main.cpp
+│   └── math
+├── third_party
+│   └── imgui
+└── vcpkg.json
+```
