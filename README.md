@@ -21,6 +21,10 @@ pivot point.
 - Shapes: triangle, square, house, car
 - 3x3 matrix below the canvas
 
+## Demo
+<img width="1920" height="1080" alt="transformations" src="https://github.com/user-attachments/assets/c79c02ac-5e10-4e43-857a-36b05fd809a6" />
+
+
 ## Project Structure
 ```text
 2d-transformations-playground
