@@ -60,7 +60,7 @@ int main()
         static int shapeIndex = 1;
         static const char *shapeNames[] = {"Triangle", "Square", "House", "Car"};
 
-        // lambda function so every slider below uses the same pattern
+        // lambda function wrapper so every slider below uses the same pattern
         auto labeled = [&](const char* label)
         {
             ImGui::Text("%s", label);
@@ -68,7 +68,31 @@ int main()
             ImGui::SetNextItemWidth(kWidgetWidth);
         };
 
-        // All sliders and labels
+        auto addTooltip = []()
+        {
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) 
+            {
+                ImGui::SetTooltip("Ctrl + Click to input a manual value");
+            }
+        };
+
+        // -------- All sliders and labels ----------
+        float iconPaddingRight = 50.0f; 
+        ImGui::SameLine(ImGui::GetWindowWidth() - iconPaddingRight); // calculate right corner position
+
+        ImGui::SetWindowFontScale(2.0f); // help icon
+        ImGui::TextDisabled("(?)");
+        ImGui::SetWindowFontScale(1.0f);
+
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort))
+        {
+            ImGui::BeginTooltip();
+            ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+            ImGui::TextUnformatted("Ctrl + Click on any slider below to input a manual value.");
+            ImGui::PopTextWrapPos();
+            ImGui::EndTooltip();
+        }
+
         labeled("Shape");
         ImGui::Combo("##shape", &shapeIndex, shapeNames, 4);
 
@@ -91,6 +115,7 @@ int main()
 
         ImGui::Checkbox("Show original shape", &showOriginal);
 
+        // -------------------------------------------
         const math2d::Mat3 M = math2d::buildStandardTransform(
             translation[0], translation[1],
             rotationDeg,
