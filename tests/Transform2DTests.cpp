@@ -313,3 +313,54 @@ TEST(Transform2D, buildLinearOnlyTransformMatchesLinearBlockOfStandardOne)
     expectSameMatrix(linear, full);
 }
 
+// ---------------------------------------------------------------------------
+// Shape + basis helpers
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, transformShapeWithIdentityReturnsTheShapeUnchanged)
+{
+    const auto original = math2d::makeHouse();
+    const auto moved    = math2d::transformShape(math2d::makeIdentity(), original);
+
+    // ASSERT_*: if sizes differ, the loop below indexes out of bounds and would crash
+    ASSERT_EQ(moved.size(), original.size());
+
+    for (size_t i = 0; i < original.size(); i++)
+    {
+        EXPECT_NEAR(moved[i].x, original[i].x, kEps);
+        EXPECT_NEAR(moved[i].y, original[i].y, kEps);
+    }
+}
+
+TEST(Transform2D, transformShapeTranslatesEveryVertexByTxTy)
+{
+    const auto original = math2d::makeTriangle();
+    const auto moved    = math2d::transformShape(math2d::makeTranslation(5.0f, -3.0f), original);
+
+    ASSERT_EQ(moved.size(), original.size());
+
+    for (size_t i = 0; i < original.size(); i++)
+    {
+        EXPECT_NEAR(moved[i].x, original[i].x + 5.0f, kEps);
+        EXPECT_NEAR(moved[i].y, original[i].y - 3.0f, kEps);
+    }
+}
+
+TEST(Transform2D, transformedBasisXOfIdentityRetrievesTheStandardXBasis)
+{
+    const auto basis = math2d::transformedBasisX(math2d::makeIdentity());
+
+    EXPECT_NEAR(basis[0].x, 0.0f, kEps); // origin
+    EXPECT_NEAR(basis[0].y, 0.0f, kEps);
+    EXPECT_NEAR(basis[1].x, 3.0f, kEps); // 3 units along x
+    EXPECT_NEAR(basis[1].y, 0.0f, kEps);
+}
+
+TEST(Transform2D, transformedBasisYOfNinetyDegreeRotationPointsAlongMinusX)
+{
+    const auto basis = math2d::transformedBasisY(math2d::makeRotationDeg(90.0f));
+
+    // the arrow length stays 3. the CCW rotation sends +y onto -x.
+    EXPECT_NEAR(basis[1].x, -3.0f, kEps);
+    EXPECT_NEAR(basis[1].y, 0.0f, kEps);
+}
