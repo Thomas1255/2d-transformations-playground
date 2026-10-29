@@ -27,7 +27,7 @@ pivot point.
 <img width="1920" height="1080" alt="transformations" src="https://github.com/user-attachments/assets/c79c02ac-5e10-4e43-857a-36b05fd809a6" />
 
 
-## Testing
+## Testing (Uses Google Test)
 - In the command line:
    ```bash
    `build test`
