@@ -38,19 +38,12 @@ add_executable(TransformPlayground
 target_include_directories(TransformPlayground PRIVATE src)
 target_link_libraries(TransformPlayground PRIVATE imgui math2d)
 
-# ---------------- tests (Google Test, run through ctest) ----------------
-# find_package = "ask vcpkg whether gtest is in the manifest and give us its
-# usage info." This defines the GTest::gtest / GTest::gtest_main targets.
+# ---------------- tests (Google Test) ----------------
 find_package(GTest CONFIG REQUIRED)
 
-# Unit-test executable. Only links math2d (pure library, no GL/ImGui needed),
-# which is exactly why the math lives in its own lib at all.
-# gtest_main supplies main(); we never write one.
 add_executable(TransformTests tests/Transform2DTests.cpp)
 target_include_directories(TransformTests PRIVATE src)
 target_link_libraries(TransformTests PRIVATE math2d GTest::gtest_main)
 
-# Register with CMake's test runner (ctest ships with CMake itself, nothing to
-# install). Without add_test, ctest has no idea this executable is a test.
 enable_testing()                                       # discovers add_test calls in this dir
 add_test(NAME TransformTests COMMAND TransformTests)   # how ctest invokes it  

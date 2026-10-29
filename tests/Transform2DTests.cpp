@@ -84,3 +84,37 @@ TEST(Transform2D, makeScalePutsSxSyOnTheDiagonal)
     EXPECT_NEAR(S.m[1][0], 0.0f, kEps);
 }
 
+// ---------------------------------------------------------------------------
+// transform: the point / direction-vector distinction (homogeneous w)
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, transformMovesPointsButNotDirectionVectors)
+{
+    const math2d::Mat3 T = math2d::makeTranslation(10.0f, 20.0f);
+
+    const math2d::Vec3 point  = math2d::transform(T, math2d::makePoint(1.0f, 1.0f));
+    const math2d::Vec3 vector = math2d::transform(T, math2d::makeVector(1.0f, 1.0f));
+
+    EXPECT_NEAR(point.x, 11.0f, kEps);
+    EXPECT_NEAR(point.y, 21.0f, kEps);
+    EXPECT_NEAR(point.w, 1.0f, kEps);
+
+    // A direction has no position, so translation must change nothing about it.
+    EXPECT_NEAR(vector.x, 1.0f, kEps);
+    EXPECT_NEAR(vector.y, 1.0f, kEps);
+    EXPECT_NEAR(vector.w, 0.0f, kEps);
+}
+
+TEST(Transform2D, transformScalingIsLinearAndHitsPointsAndVectorsAlike)
+{
+    const math2d::Mat3 S = math2d::makeScale(2.0f, -3.0f);
+
+    const math2d::Vec3 point  = math2d::transform(S, math2d::makePoint(4.0f, 1.0f));
+    const math2d::Vec3 vector = math2d::transform(S, math2d::makeVector(4.0f, 1.0f));
+
+    EXPECT_NEAR(point.x, 8.0f, kEps);
+    EXPECT_NEAR(point.y, -3.0f, kEps);
+    EXPECT_NEAR(vector.x, point.x, kEps);
+    EXPECT_NEAR(vector.y, point.y, kEps);
+}
+
