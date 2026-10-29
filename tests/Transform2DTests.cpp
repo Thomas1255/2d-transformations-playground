@@ -255,3 +255,61 @@ TEST(Transform2D, scaleAboutPivotPivotFixedNeighborsScaleAwayFromIt)
     EXPECT_NEAR(nextDoor.x, cx + 1.0f * 2.0f, kEps);
     EXPECT_NEAR(nextDoor.y, cy + 1.0f * 2.0f, kEps);
 }
+
+// ---------------------------------------------------------------------------
+// buildStandardTransform: the composition order
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, buildStandardTransformEqualsTRShYShXSComposedByHand)
+{
+    const float tx = 1.5f, ty = -0.5f;
+    const float angle = 30.0f;
+    const float sx = 2.0f, sy = 0.5f;
+    const float shx = 0.25f, shy = -1.0f;
+
+    const math2d::Mat3 actual = math2d::buildStandardTransform(tx, ty, angle, sx, sy, shx, shy);
+
+    // Rebuild the exact order T * R * ShY * ShX * S by hand.
+    const math2d::Mat3 left  = math2d::multiply(math2d::makeTranslation(tx, ty),
+                                                math2d::makeRotationDeg(angle));
+    const math2d::Mat3 mid   = math2d::multiply(left, math2d::makeShearY(shy));
+    const math2d::Mat3 mid2  = math2d::multiply(mid, math2d::makeShearX(shx));
+    const math2d::Mat3 right = math2d::multiply(mid2, math2d::makeScale(sx, sy));
+
+    expectSameMatrix(actual, right);
+}
+
+TEST(Transform2D, buildStandardTransformWithPivotFlagsMatchesPivotHandCompose)
+{
+    const float tx = -0.25f, ty = 2.0f;
+    const float angle = 45.0f;
+    const float sx = 1.5f, sy = -0.5f;
+    const float shx = 0.0f, shy = 0.25f;
+    const float px = 1.0f, py = 1.0f;
+
+    const math2d::Mat3 actual = math2d::buildStandardTransform(
+        tx, ty, angle, sx, sy, shx, shy,
+        /*pivotRotation*/ true, /*pivotScale*/ true, px, py);
+
+    const math2d::Mat3 l01 = math2d::multiply(math2d::makeTranslation(tx, ty),
+                                              math2d::makeRotationAboutPivot(angle, px, py));
+    const math2d::Mat3 l02 = math2d::multiply(l01, math2d::makeShearY(shy));
+    const math2d::Mat3 l03 = math2d::multiply(l02, math2d::makeShearX(shx));
+    const math2d::Mat3 l04 = math2d::multiply(l03, math2d::makeScaleAboutPivot(sx, sy, px, py));
+
+    expectSameMatrix(actual, l04);
+}
+
+TEST(Transform2D, buildLinearOnlyTransformMatchesLinearBlockOfStandardOne)
+{
+    const float angle = 20.0f;
+    const float sx = 1.25f, sy = 2.0f;
+    const float shx = 0.5f, shy = 0.0f;
+
+    const math2d::Mat3 linear = math2d::buildLinearOnlyTransform(angle, sx, sy, shx, shy);
+    const math2d::Mat3 full   = math2d::buildStandardTransform(0.0f, 0.0f, angle, sx, sy, shx, shy);
+
+    // with zero translation the whole matrix is the linear part.
+    expectSameMatrix(linear, full);
+}
+
