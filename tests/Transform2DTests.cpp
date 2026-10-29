@@ -208,3 +208,50 @@ TEST(Transform2D, multiplyIdentityIsANoOpFromBothSides)
     expectSameMatrix(math2d::multiply(T, I), T);
     expectSameMatrix(math2d::multiply(I, T), T);
 }
+
+// ---------------------------------------------------------------------------
+// Pivot transforms: the pivot must be a FIXED point
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, rotationAboutPivotLeavesThePivotItselfFixed)
+{
+    const float cx = 1.0f;
+    const float cy = 1.0f;
+
+    const math2d::Mat3 M  = math2d::makeRotationAboutPivot(90.0f, cx, cy);
+    const math2d::Vec3 at = math2d::transform(M, math2d::makePoint(cx, cy));
+
+    EXPECT_NEAR(at.x, cx, kEps);
+    EXPECT_NEAR(at.y, cy, kEps);
+    EXPECT_NEAR(at.w, 1.0f, kEps);
+}
+
+TEST(Transform2D, rotationAboutPivotPreservesDistanceFromThePivot)
+{
+    const float cx = 1.0f, cy = 1.0f;
+
+    const math2d::Mat3 M = math2d::makeRotationAboutPivot(37.0f, cx, cy);
+    const math2d::Vec3 p = math2d::transform(M, math2d::makePoint(4.0f, 2.0f));
+
+    const float dBefore = std::sqrt((4.0f - cx) * (4.0f - cx) + (2.0f - cy) * (2.0f - cy));
+    const float dAfter  = std::sqrt((p.x - cx) * (p.x - cx) + (p.y - cy) * (p.y - cy));
+
+    EXPECT_NEAR(dAfter, dBefore, kEps);
+}
+
+TEST(Transform2D, scaleAboutPivotPivotFixedNeighborsScaleAwayFromIt)
+{
+    const float cx = 1.0f, cy = 1.0f;
+
+    const math2d::Vec3 pivot = math2d::transform(math2d::makeScaleAboutPivot(2.0f, 2.0f, cx, cy),
+                                                 math2d::makePoint(cx, cy));
+    const math2d::Vec3 nextDoor = math2d::transform(math2d::makeScaleAboutPivot(2.0f, 2.0f, cx, cy),
+                                                    math2d::makePoint(2.0f, 2.0f));
+
+    EXPECT_NEAR(pivot.x, cx, kEps);
+    EXPECT_NEAR(pivot.y, cy, kEps);
+
+    // (2,2) is (1,1) from the pivot; doubling lands it at (1,1)*2 + pivot.
+    EXPECT_NEAR(nextDoor.x, cx + 1.0f * 2.0f, kEps);
+    EXPECT_NEAR(nextDoor.y, cy + 1.0f * 2.0f, kEps);
+}
