@@ -19,8 +19,15 @@ rem ---- Load VS's dev environment: this puts its bundled cmake on PATH ----
 call "%VSDIR%\Common7\Tools\VsDevCmd.bat" -no_logo -arch=x64
 if errorlevel 1 exit /b 1
 
-cmake --preset release       || exit /b 1
+cmake --preset release        || exit /b 1
 cmake --build --preset release || exit /b 1
+
+rem ---- `build.cmd test` runs the unit tests instead of launching the app ----
+if /i "%~1"=="test" (
+    ctest --preset release
+    exit /b 0
+)
+
 build\Release\TransformPlayground.exe
 exit /b 0
 
