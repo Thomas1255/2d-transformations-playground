@@ -155,3 +155,26 @@ TEST(Transform2D, rotationOf180DegreesMapsEveryPointToItsNegation)
     EXPECT_NEAR(q.y, -5.0f, kEps);
 }
 
+// ---------------------------------------------------------------------------
+// Shear
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, shearXDisplacesXProportionalToY)
+{
+    const math2d::Mat3 Sh = math2d::makeShearX(2.0f);
+    const math2d::Vec3 p  = math2d::transform(Sh, math2d::makePoint(1.0f, 3.0f));
+
+    // x' = x + kx * y
+    EXPECT_NEAR(p.x, 1.0f + 2.0f * 3.0f, kEps);
+    EXPECT_NEAR(p.y, 3.0f, kEps); // y never changes in an x-shear
+}
+
+TEST(Transform2D, shearYDisplacesYProportionalToX)
+{
+    const math2d::Mat3 Sh = math2d::makeShearY(2.0f);
+    const math2d::Vec3 p  = math2d::transform(Sh, math2d::makePoint(1.0f, 3.0f));
+
+    // y' = ky * x + y
+    EXPECT_NEAR(p.y, 2.0f * 1.0f + 3.0f, kEps);
+    EXPECT_NEAR(p.x, 1.0f, kEps);
+}
