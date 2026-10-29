@@ -41,3 +41,46 @@ namespace
         EXPECT_NEAR(a.w, b.w, kEps);
     }
 }
+
+// ---------------------------------------------------------------------------
+// Constructors: exact matrix layouts
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, makeIdentityReturnsTheIdentityMatrix)
+{
+    const math2d::Mat3 I = math2d::makeIdentity();
+
+    EXPECT_NEAR(I.m[0][0], 1.0f, kEps);
+    EXPECT_NEAR(I.m[0][1], 0.0f, kEps);
+    EXPECT_NEAR(I.m[0][2], 0.0f, kEps);
+
+    EXPECT_NEAR(I.m[1][0], 0.0f, kEps);
+    EXPECT_NEAR(I.m[1][1], 1.0f, kEps);
+    EXPECT_NEAR(I.m[1][2], 0.0f, kEps);
+
+    EXPECT_NEAR(I.m[2][0], 0.0f, kEps);
+    EXPECT_NEAR(I.m[2][1], 0.0f, kEps);
+    EXPECT_NEAR(I.m[2][2], 1.0f, kEps);
+}
+
+TEST(Transform2D, makeTranslationPutsTxTyInTheTranslationColumn)
+{
+    const math2d::Mat3 T = math2d::makeTranslation(4.0f, -2.0f);
+
+    // The linear block stays identity; only column 2 carries the offset.
+    EXPECT_NEAR(T.m[0][0], 1.0f, kEps);
+    EXPECT_NEAR(T.m[1][1], 1.0f, kEps);
+    EXPECT_NEAR(T.m[0][2], 4.0f, kEps);
+    EXPECT_NEAR(T.m[1][2], -2.0f, kEps);
+}
+
+TEST(Transform2D, makeScalePutsSxSyOnTheDiagonal)
+{
+    const math2d::Mat3 S = math2d::makeScale(3.0f, 0.5f);
+
+    EXPECT_NEAR(S.m[0][0], 3.0f, kEps);
+    EXPECT_NEAR(S.m[1][1], 0.5f, kEps);
+    EXPECT_NEAR(S.m[0][1], 0.0f, kEps); // must NOT be transposed
+    EXPECT_NEAR(S.m[1][0], 0.0f, kEps);
+}
+
