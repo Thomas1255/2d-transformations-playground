@@ -178,3 +178,33 @@ TEST(Transform2D, shearYDisplacesYProportionalToX)
     EXPECT_NEAR(p.y, 2.0f * 1.0f + 3.0f, kEps);
     EXPECT_NEAR(p.x, 1.0f, kEps);
 }
+
+// ---------------------------------------------------------------------------
+// multiply
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, multiplyCompositionOfLandSBehavesLikeMoveThenScale)
+{
+    // Order matters:
+    //   T * S  moves the (scaled) result.
+    //   S * T  scales the offset too, moving points twice as far.
+    const math2d::Mat3 TS = math2d::multiply(math2d::makeTranslation(1.0f, 2.0f),
+                                             math2d::makeScale(2.0f, 3.0f));
+    const math2d::Mat3 ST = math2d::multiply(math2d::makeScale(2.0f, 3.0f),
+                                             math2d::makeTranslation(1.0f, 2.0f));
+
+    EXPECT_NEAR(TS.m[0][2], 1.0f, kEps); // T*S leaves the offset alone
+    EXPECT_NEAR(ST.m[0][2], 2.0f, kEps); // S*T scales it
+
+    EXPECT_NEAR(TS.m[0][0], 2.0f, kEps);
+    EXPECT_NEAR(TS.m[1][1], 3.0f, kEps);
+}
+
+TEST(Transform2D, multiplyIdentityIsANoOpFromBothSides)
+{
+    const math2d::Mat3 T = math2d::makeTranslation(3.0f, 7.0f);
+    const math2d::Mat3 I = math2d::makeIdentity();
+
+    expectSameMatrix(math2d::multiply(T, I), T);
+    expectSameMatrix(math2d::multiply(I, T), T);
+}
