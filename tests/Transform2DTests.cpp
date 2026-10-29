@@ -118,3 +118,40 @@ TEST(Transform2D, transformScalingIsLinearAndHitsPointsAndVectorsAlike)
     EXPECT_NEAR(vector.y, point.y, kEps);
 }
 
+// ---------------------------------------------------------------------------
+// Rotation (about the origin)
+// ---------------------------------------------------------------------------
+
+TEST(Transform2D, rotationOfZeroDegreesIsTheIdentity)
+{
+    const math2d::Mat3 R0 = math2d::makeRotationDeg(0.0f);
+    const math2d::Mat3 I  = math2d::makeIdentity();
+
+    expectSameMatrix(R0, I);
+}
+
+TEST(Transform2D, rotationOf90DegreesMapsTheXAxisOntoTheYAxis)
+{
+    const math2d::Mat3 R90 = math2d::makeRotationDeg(90.0f);
+
+    const math2d::Vec3 xAxis = math2d::transform(R90, math2d::makeVector(1.0f, 0.0f));
+    const math2d::Vec3 yAxis = math2d::transform(R90, math2d::makeVector(0.0f, 1.0f));
+
+    // Degenerate check: sin(90) = 1 is exact-ish, cos(90) rounds to 0.
+    EXPECT_NEAR(xAxis.x, 0.0f, kEps);
+    EXPECT_NEAR(xAxis.y, 1.0f, kEps);
+
+    EXPECT_NEAR(yAxis.x, -1.0f, kEps);
+    EXPECT_NEAR(yAxis.y, 0.0f, kEps);
+}
+
+TEST(Transform2D, rotationOf180DegreesMapsEveryPointToItsNegation)
+{
+    const math2d::Mat3 R180 = math2d::makeRotationDeg(180.0f);
+
+    const math2d::Vec3 q = math2d::transform(R180, math2d::makePoint(2.0f, 5.0f));
+
+    EXPECT_NEAR(q.x, -2.0f, kEps);
+    EXPECT_NEAR(q.y, -5.0f, kEps);
+}
+
