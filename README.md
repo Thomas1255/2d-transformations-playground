@@ -19,4 +19,41 @@ pivot point.
 
 ## Features
 - Shapes: triangle, square, house, car
-- 3x3 matrix below the canvas
+- Transformations: translation, shear, rotation, and scale
+- Rotation and Scale about pivot
+- 3x3 matrix showing real-time values
+
+## Demo
+<img width="1920" height="1080" alt="transformations" src="https://github.com/user-attachments/assets/c79c02ac-5e10-4e43-857a-36b05fd809a6" />
+
+
+## Testing
+- In the command line:
+   ```bash
+   `build test`
+   ```
+- In x64 Native Tools Command Prompt for VS:
+     ```bash
+   `ctest --preset release --verbose`
+   ```
+   
+## Project Structure
+```text
+2d-transformations-playground
+├── CMakeLists.txt
+├── CMakePresets.json
+├── LICENSE
+├── PROGRESS.md
+├── README.md
+├── build.cmd
+├── src
+│   ├── app
+│   ├── main.cpp
+│   └── math
+├── third_party
+│   └── imgui
+└── vcpkg.json
+```
+
+## License
+Built using Dear ImGui (MIT) and GLAD (MIT). See [LICENSE](LICENSE)
